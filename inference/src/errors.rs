@@ -1,10 +1,11 @@
 use std::fmt;
-use syntax::{RhoType, Var};
+use syntax::{types::RhoType, Var};
 
 #[derive(Debug)]
 pub enum Error {
     UnexpectedRhoType { found: RhoType, expected: RhoType },
     UnboundVariable { var: Var },
+    BoundMultipleTimes { var: Var },
     NoArrow { ty: RhoType },
 }
 
@@ -16,6 +17,9 @@ impl fmt::Display for Error {
             }
             Error::UnboundVariable { var } => write!(f, "Unbound Variable {var}"),
             Error::NoArrow { ty } => write!(f, "{ty} is not an arrow type"),
+            Error::BoundMultipleTimes { var } => {
+                write!(f, "Variable {var} was bound multiple times")
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
-use super::{mono::MonoType, rho::RhoType, FreeTypevars};
+use super::{mono::MonoType, rho::RhoType, FreeTypevars, SubstTypevar};
 use crate::Var;
 use std::{collections::HashSet, fmt};
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PolyType {
-    vars: Vec<Var>,
-    ty: Box<RhoType>,
+    pub vars: Vec<Var>,
+    pub ty: Box<RhoType>,
 }
 
 impl FreeTypevars for PolyType {
@@ -15,6 +15,19 @@ impl FreeTypevars for PolyType {
             vars.remove(v);
         }
         vars
+    }
+}
+
+impl SubstTypevar for PolyType {
+    fn subst_tyvar(self, v: Var, ty: MonoType) -> Self {
+        if self.vars.contains(&v) {
+            self
+        } else {
+            PolyType {
+                vars: self.vars,
+                ty: Box::new(self.ty.subst_tyvar(v, ty)),
+            }
+        }
     }
 }
 

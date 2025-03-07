@@ -1,5 +1,9 @@
 use super::errors::Error;
-use syntax::{types::PolyType, Var};
+use std::collections::HashSet;
+use syntax::{
+    types::{FreeTypevars, PolyType},
+    Var,
+};
 
 #[derive(Clone)]
 pub struct VarBinding {
@@ -26,5 +30,11 @@ impl Context {
             var: v.to_owned(),
             ty: ty.clone(),
         })
+    }
+}
+
+impl FreeTypevars for Context {
+    fn free_tyvars(&self) -> HashSet<Var> {
+        self.vars.iter().map(|bnd| bnd.var.clone()).collect()
     }
 }

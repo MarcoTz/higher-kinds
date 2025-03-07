@@ -1,4 +1,4 @@
-use super::FreeTypevars;
+use super::{FreeTypevars, SubstTypevar};
 use crate::Var;
 use std::{collections::HashSet, fmt};
 
@@ -22,6 +22,25 @@ impl FreeTypevars for MonoType {
                 vars
             }
             MonoType::TypeVar(var) => HashSet::from([var.clone()]),
+        }
+    }
+}
+
+impl SubstTypevar for MonoType {
+    fn subst_tyvar(self, v: Var, ty: MonoType) -> Self {
+        match self {
+            MonoType::Int => MonoType::Int,
+            MonoType::Arrow { from, to } => MonoType::Arrow {
+                from: Box::new(from.subst_tyvar(v.clone(), ty.clone())),
+                to: Box::new(to.subst_tyvar(v, ty)),
+            },
+            MonoType::TypeVar(var) => {
+                if var == v {
+                    ty
+                } else {
+                    MonoType::TypeVar(var)
+                }
+            }
         }
     }
 }

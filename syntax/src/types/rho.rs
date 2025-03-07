@@ -1,8 +1,8 @@
-use super::{mono::MonoType, poly::PolyType, FreeTypevars};
+use super::{mono::MonoType, poly::PolyType, FreeTypevars, SubstTypevar};
 use crate::Var;
 use std::{collections::HashSet, fmt};
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RhoType {
     Mono(MonoType),
     Arrow { from: PolyType, to: PolyType },
@@ -27,6 +27,18 @@ impl FreeTypevars for RhoType {
                 vars.extend(to.free_tyvars());
                 vars
             }
+        }
+    }
+}
+
+impl SubstTypevar for RhoType {
+    fn subst_tyvar(self, v: Var, ty: MonoType) -> Self {
+        match self {
+            RhoType::Mono(mono) => RhoType::Mono(mono.subst_tyvar(v, ty)),
+            RhoType::Arrow { from, to } => RhoType::Arrow {
+                from: from.subst_tyvar(v.clone(), ty.clone()),
+                to: to.subst_tyvar(v, ty),
+            },
         }
     }
 }

@@ -40,7 +40,9 @@ pub fn check_type(t: &Term, ty: &RhoType, ctx: &mut Context) -> Result<(), Error
         }
         Term::App { fun, arg } => {
             let fun_ty = infer_type(fun, &mut ctx.clone())?;
-            let (poly_from, poly_to) = fun_ty.as_arrow().ok_or(Error::NoArrow { ty: fun_ty })?;
+            let (poly_from, poly_to) = fun_ty
+                .as_arrow()
+                .ok_or(Error::NoArrow { ty: fun_ty.clone() })?;
             check_poly(arg, poly_from, ctx)?;
             check_inst(poly_to, ty)
         }

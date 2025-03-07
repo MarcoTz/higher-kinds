@@ -37,7 +37,9 @@ pub fn infer_type(t: &Term, ctx: &mut Context) -> Result<RhoType, Error> {
         }
         Term::App { fun, arg } => {
             let from_ty = infer_type(fun, &mut ctx.clone())?;
-            let (poly_from, poly_to) = from_ty.as_arrow().ok_or(Error::NoArrow { ty: from_ty })?;
+            let (poly_from, poly_to) = from_ty.as_arrow().ok_or(Error::NoArrow {
+                ty: from_ty.clone(),
+            })?;
             check_poly(arg, poly_from, ctx)?;
             infer_inst(poly_to)
         }

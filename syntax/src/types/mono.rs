@@ -1,5 +1,6 @@
+use super::FreeTypevars;
 use crate::Var;
-use std::fmt;
+use std::{collections::HashSet, fmt};
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum MonoType {
@@ -9,6 +10,20 @@ pub enum MonoType {
         to: Box<MonoType>,
     },
     TypeVar(Var),
+}
+
+impl FreeTypevars for MonoType {
+    fn free_tyvars(&self) -> HashSet<Var> {
+        match self {
+            MonoType::Int => HashSet::new(),
+            MonoType::Arrow { from, to } => {
+                let mut vars = from.free_tyvars();
+                vars.extend(to.free_tyvars());
+                vars
+            }
+            MonoType::TypeVar(var) => HashSet::from([var.clone()]),
+        }
+    }
 }
 
 impl fmt::Display for MonoType {

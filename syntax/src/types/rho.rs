@@ -1,5 +1,6 @@
-use super::{mono::MonoType, poly::PolyType};
-use std::fmt;
+use super::{mono::MonoType, poly::PolyType, FreeTypevars};
+use crate::Var;
+use std::{collections::HashSet, fmt};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum RhoType {
@@ -13,6 +14,19 @@ impl RhoType {
             Some((from, to))
         } else {
             None
+        }
+    }
+}
+
+impl FreeTypevars for RhoType {
+    fn free_tyvars(&self) -> HashSet<Var> {
+        match self {
+            RhoType::Mono(mono) => mono.free_tyvars(),
+            RhoType::Arrow { from, to } => {
+                let mut vars = from.free_tyvars();
+                vars.extend(to.free_tyvars());
+                vars
+            }
         }
     }
 }

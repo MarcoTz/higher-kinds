@@ -1,11 +1,21 @@
-use super::{mono::MonoType, rho::RhoType};
+use super::{mono::MonoType, rho::RhoType, FreeTypevars};
 use crate::Var;
-use std::fmt;
+use std::{collections::HashSet, fmt};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct PolyType {
     vars: Vec<Var>,
     ty: Box<RhoType>,
+}
+
+impl FreeTypevars for PolyType {
+    fn free_tyvars(&self) -> HashSet<Var> {
+        let mut vars = self.ty.free_tyvars();
+        for v in self.vars.iter() {
+            vars.remove(v);
+        }
+        vars
+    }
 }
 
 impl From<RhoType> for PolyType {

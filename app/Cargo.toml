@@ -1,0 +1,12 @@
+[package]
+name="higher-rank"
+version="0.1.0"
+edition="2024"
+
+[[bin]]
+name="higher-rank"
+path="src/main.rs"
+
+[dependencies]
+syntax={path="../syntax"}
+inference={path="../inference"}
